@@ -60,6 +60,7 @@ enum Stage {
     X2,
     X3,
     X5,
+    X6,
     X8,
 }
 
@@ -258,6 +259,7 @@ impl Solver {
 
         // Add first spacer
         let spacer_index = elements.len();
+        assert_eq!(spacer_index, n+1);
         let spacer = Spacer {
             ulink: spacer_index,
             dlink: spacer_index,
@@ -435,22 +437,24 @@ impl Solver {
     #[allow(dead_code)]
     pub fn solve(&mut self) -> Option<Vec<String>> {
         // Follows stages of algorithm description in Fasc 5c, Knuth
-        /*
                 loop{
                     match self.stage {
                         Stage::X2 => match self.x2() {
                             Some(z) => return Some(z),
                             None => {},
                         },
-                        Stage::X3 => self.x3x4(),
-                        Stage::X5 => self.x5(),
-                        Stage::X8 => self.x8(),
+                        Stage::X3 => {self.x3x4();},
+                        Stage::X5 => {self.x5();},
+                        Stage::X6 => {self.x6();},
+                        Stage::X8 => match self.x8() {
+                            true => {},
+                            false =>{ return None;},
+                        },
 
                     };
 
 
                 }
-        */
 
         //        None
 
@@ -478,10 +482,12 @@ impl Solver {
                 return Some(to_return);
             } else {
                 self.yielding = true;
-                return self.x8();
+                self.stage = Stage::X8;
+                return None;
             }
         }
-        self.x3x4()
+        self.stage = Stage::X3;
+        None
     }
 
     /// Stages X3 and X4 of algorithm X
@@ -522,7 +528,9 @@ impl Solver {
         //     println!("self.l: {}",self.l);
         self.sol_vec[self.l] = x_l;
 
-        self.x5()
+        self.stage = Stage::X5;
+        None
+//        self.x5()
     }
     /// Stages X5 and X7 of Algorithm X
     ///
@@ -551,7 +559,8 @@ impl Solver {
 
             //            println!("Uncovering X7: {}", x_l);
             self.uncover(x_l).unwrap();
-            return self.x8();
+            self.stage = Stage::X8;
+            return None;
         }
 
         let mut p = x_l + 1;
@@ -582,7 +591,9 @@ impl Solver {
         //        println!("--");
 
         self.l += 1;
-        self.x2()
+        self.stage = Stage::X2;
+        None
+        //self.x2()
     }
 
     /// Stage X6 of Algorithm X
@@ -607,19 +618,23 @@ impl Solver {
         self.idx = self.elements[x_l].top();
         self.sol_vec[self.l] = self.elements[x_l].d();
 
-        self.x5()
+        self.stage = Stage::X5;
+        None
+//        self.x5()
     }
 
     /// Stage X8 of Algorithm X
     /// Leave level l
     /// Terminate if l=0, otherwise l=l-1, go to X6
-    fn x8(&mut self) -> Option<Vec<String>> {
+    fn x8(&mut self) -> bool {
         // X8
         match self.l {
-            0 => None,
+            0 => false,
             _ => {
                 self.l -= 1;
-                self.x6()
+                self.stage = Stage::X6;
+                true
+//                self.x6()
             }
         }
     }
@@ -692,6 +707,6 @@ impl Iterator for Solver {
     /// Returns `Some` containing a vector of items if a solution remains, or
     /// `None` when no more solutions remaining
     fn next(&mut self) -> Option<Self::Item> {
-        self.x2()
+        self.solve()
     }
 }
