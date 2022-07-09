@@ -1,7 +1,8 @@
 # dlx_rs
 
-This crate implements and provides an interface to solve [exact cover]()
-problems to Knuth's [Dancing Links](https) (DLX) algorithm.
+A Rust library for solving exact cover/constraint problems problems using
+Knuth's [Dancing Links](https) (DLX) algorithm.
+
 It also provides specific interfaces for some common exact cover problems,
 specifically: 
 

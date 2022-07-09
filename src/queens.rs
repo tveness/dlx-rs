@@ -1,4 +1,4 @@
-use crate::solver::Solver;
+use crate::Solver;
 
 /// Implements solution to the N queens problem
 ///
@@ -65,7 +65,7 @@ impl Iterator for Queens {
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(sol) = self.solver.next() {
             let mut n_queens_solved = Vec::with_capacity(self.n);
-            for (count, i) in sol.iter().enumerate() {
+            for i in sol {
                 let i = i.as_str();
                 let s: Vec<&str> = i.split(&['R', 'C']).collect(); //.split('C').split('#');
                 let r: usize = s[1].parse().unwrap();
