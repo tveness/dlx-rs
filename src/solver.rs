@@ -2,23 +2,27 @@ use std::collections::HashMap;
 use std::fmt;
 type Index = usize;
 
+
 enum LinkType {
     Spacer,
     Item,
     OptionElement,
 }
 
+#[derive(Clone)]
 struct OptionElement {
     ulink: Index,
     dlink: Index,
     top: Index,
 }
 
+#[derive(Clone)]
 struct Spacer {
     ulink: Index,
     dlink: Index,
 }
 
+#[derive(Clone)]
 struct Item {
     ulink: Index,
     dlink: Index,
@@ -64,6 +68,7 @@ struct Item {
 /// }
 /// 
 /// ```
+#[derive(Clone)]
 pub struct Solver {
     elements: Vec<Box<dyn Link>>,
     items: Index,
@@ -76,6 +81,7 @@ pub struct Solver {
     spacer_ids: HashMap<Index, usize>,
     stage: Stage,
 }
+#[derive(Clone)]
 enum Stage {
     X2,
     X3,
@@ -83,6 +89,7 @@ enum Stage {
     X6,
     X8,
 }
+
 
 impl fmt::Display for Solver {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -140,9 +147,13 @@ trait Link {
     fn inc_l(&mut self);
     fn dec_l(&mut self);
     fn get_l(&self) -> usize;
+    fn clone_dyn(&self) -> Box<dyn Link>;
 }
 
 impl Link for Spacer {
+    fn clone_dyn(&self) -> Box<dyn Link> {
+        Box::new( self.clone() )
+    }
     fn r(&self) -> Index {
         0
     }
@@ -176,6 +187,9 @@ impl Link for Spacer {
     }
 }
 impl Link for OptionElement {
+    fn clone_dyn(&self) -> Box<dyn Link> {
+        Box::new( self.clone() )
+    }
     fn set_r(&mut self, _u: Index) {}
     fn set_l(&mut self, _u: Index) {}
     fn r(&self) -> Index {
@@ -209,6 +223,9 @@ impl Link for OptionElement {
     }
 }
 impl Link for Item {
+    fn clone_dyn(&self) -> Box<dyn Link> {
+        Box::new( self.clone() )
+    }
     fn r(&self) -> Index {
         self.rlink
     }
@@ -783,4 +800,11 @@ impl Iterator for Solver {
     fn next(&mut self) -> Option<Self::Item> {
         self.solve()
     }
+}
+
+impl Clone for Box<dyn Link> {
+    fn clone(&self) -> Self {
+        self.clone_dyn()
+    }
+
 }
