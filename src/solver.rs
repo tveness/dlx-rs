@@ -2,8 +2,6 @@ use std::collections::HashMap;
 use std::fmt;
 type Index = usize;
 
-
-
 enum LinkType {
     Spacer,
     Item,
@@ -270,17 +268,17 @@ impl Link for Item {
 impl Solver {
     /// Returns a solver with `n` items, all of which must be covered exactly
     /// once
-    pub fn new(n: Index) -> Self{
-        Self::new_optional( n,0)
+    pub fn new(n: Index) -> Self {
+        Self::new_optional(n, 0)
     }
 
     /// Returns a solver with `n` mandatory items and `m` optional items to be covered
     /// This allows us to include items which may or may not be covered (but
     /// still may not be covered more than once)
-    /// 
+    ///
     /// Example, where optional elements are after |
     /// ```text
-    ///     i1  i2  i3  i4 | i5 
+    ///     i1  i2  i3  i4 | i5
     /// o1   1   0   1  0  |  0
     /// o2   0   1   0  1  |  0
     /// o3   1   0   0  0  !  1
@@ -289,19 +287,19 @@ impl Solver {
     /// ```
     /// Here we can see taking \[o1,o2\] works, as does \[o2,o3,o4\], but *not*
     /// \[o2,o3,o5\], because then i4 would be double covered
-    /// 
+    ///
     /// The code that does this is
     /// ```
     ///# use dlx_rs::solver::Solver;
-    /// 
+    ///
     /// let mut s = Solver::new_optional(4,1);
-    /// 
+    ///
     /// s.add_option("o1", &[1,3]);
     /// s.add_option("o2", &[2,4]);
     /// s.add_option("o3", &[1,5]);
     /// s.add_option("o4", &[3]);
     /// s.add_option("o5", &[3,5]);
-    /// 
+    ///
     /// let s1 = s.next().unwrap();
     /// let s2 = s.next().unwrap();
     /// let s3 = s.next();
@@ -309,13 +307,13 @@ impl Solver {
     /// assert_eq!(s2,["o2","o3","o4"]);
     /// assert_eq!(s3,None);
     /// ```
-    /// 
-    pub fn new_optional( mandatory: Index, opt: Index) -> Self {
+    ///
+    pub fn new_optional(mandatory: Index, opt: Index) -> Self {
         // optional stores the index where the optional parameters begin: this
         // is required for both checking completeness of solution (in step X2)
         // and also in choosing MRV (step X3)
-        let optional = mandatory+1;
-        let n = mandatory+opt;
+        let optional = mandatory + 1;
+        let n = mandatory + opt;
         // First add null at element 0 (allows us to traverse items list)
         let mut elements: Vec<Box<dyn Link>> = vec![Box::new(Item {
             ulink: 0,
@@ -612,7 +610,7 @@ impl Solver {
         //println!("State:");
         //println!("{}",self);
         //println!("RLINK: {}",self.elements[0].r());
-        if self.elements[0].r() == 0  || self.elements[0].r() >= self.optional {
+        if self.elements[0].r() == 0 || self.elements[0].r() >= self.optional {
             if self.yielding {
                 self.yielding = false;
                 return Some(self.output());
@@ -790,33 +788,33 @@ impl Solver {
     /// constraint solution, this is how to search for specific answers e.g. a
     /// Sudoku has all the constraints (items and options), and then the squares
     /// filled out in the specific problem need to be selected
-    /// 
+    ///
     /// So for the problem
-    /// 
+    ///
     /// ```text
     ///    i1  i2  i3
-    /// o1  1   0   0 
+    /// o1  1   0   0
     /// o2  1   0   0
     /// o3  0   1   1
     /// ```
     /// Clearly *both* \[o1,o3\] and \[o2,o3\] are solutions, but if we select o1, then only one solution remains
-    /// 
+    ///
     /// ```
     ///# use dlx_rs::solver::Solver;
-    /// 
+    ///
     /// let mut s = Solver::new(3);
-    /// 
+    ///
     /// s.add_option("o1",&[1]);
     /// s.add_option("o2",&[1]);
     /// s.add_option("o3",&[2,3]);
-    /// 
-    /// // First get all solutions 
+    ///
+    /// // First get all solutions
     /// let sols: Vec<Vec<String>> = s.clone().collect();
     /// assert_eq!( sols.len(), 2);
     /// assert_eq!( vec!["o3", "o1"], sols[0]);
     /// assert_eq!( vec!["o3", "o2"], sols[1]);
-    /// 
-    /// 
+    ///
+    ///
     /// // Now select o1 and get all solutions
     /// s.select("o1");
     /// assert_eq!( vec!["o3"], s.next().unwrap());

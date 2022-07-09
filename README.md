@@ -6,6 +6,6 @@ It also provides specific interfaces for some common exact cover problems,
 specifically: 
 
 * arbitrary Sudokus
+* N queens problem 
 * Pentomino tilings (TODO)
-* N queens problem (TODO), 
 * graph colouring (TODO)
