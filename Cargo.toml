@@ -1,6 +1,6 @@
 [package]
 name = "dlx-rs"
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
 license = "CC0-1.0"
 description = "Implementation of dancing links in Rust"
