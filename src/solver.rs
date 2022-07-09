@@ -3,6 +3,7 @@ use std::fmt;
 type Index = usize;
 
 
+
 enum LinkType {
     Spacer,
     Item,
@@ -44,13 +45,13 @@ struct Item {
 /// where arrows denote links.
 ///
 /// The spacers s0,..., also form a doubly circularly linked list.
-/// 
+///
 /// i0 is the root node for the linked list of items i1,...,.i4
-/// 
+///
 /// s0 is the root node for the spacers  which link vertically to each other
-/// 
+///
 /// ⦿ denote the option elements which contain links up and down and also reference their "parent" item
-/// 
+///
 /// We may set up and solve this problem with the following code
 /// ```
 ///# use dlx_rs::solver::Solver;
@@ -61,12 +62,10 @@ struct Item {
 /// s.add_option("o2", &[3]);
 /// s.add_option("o3", &[2,4]);
 /// s.add_option("o4", &[1]);
-/// 
+///
 /// // Iterate through all solutions
-/// for solution in s {
-///     assert_eq!(solution, ["o2","o3","o4"]);
-/// }
-/// 
+/// assert_eq!(s.next().unwrap(), ["o2","o3","o4"]);
+///
 /// ```
 #[derive(Clone)]
 pub struct Solver {
@@ -80,6 +79,7 @@ pub struct Solver {
     names: Vec<String>,
     spacer_ids: HashMap<Index, usize>,
     stage: Stage,
+    optional: Index,
 }
 #[derive(Clone)]
 enum Stage {
@@ -89,7 +89,6 @@ enum Stage {
     X6,
     X8,
 }
-
 
 impl fmt::Display for Solver {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -152,7 +151,7 @@ trait Link {
 
 impl Link for Spacer {
     fn clone_dyn(&self) -> Box<dyn Link> {
-        Box::new( self.clone() )
+        Box::new(self.clone())
     }
     fn r(&self) -> Index {
         0
@@ -188,7 +187,7 @@ impl Link for Spacer {
 }
 impl Link for OptionElement {
     fn clone_dyn(&self) -> Box<dyn Link> {
-        Box::new( self.clone() )
+        Box::new(self.clone())
     }
     fn set_r(&mut self, _u: Index) {}
     fn set_l(&mut self, _u: Index) {}
@@ -224,7 +223,7 @@ impl Link for OptionElement {
 }
 impl Link for Item {
     fn clone_dyn(&self) -> Box<dyn Link> {
-        Box::new( self.clone() )
+        Box::new(self.clone())
     }
     fn r(&self) -> Index {
         self.rlink
@@ -269,7 +268,54 @@ impl Link for Item {
 }
 
 impl Solver {
-    pub fn new(n: Index) -> Self {
+    /// Returns a solver with `n` items, all of which must be covered exactly
+    /// once
+    pub fn new(n: Index) -> Self{
+        Self::new_optional( n,0)
+    }
+
+    /// Returns a solver with `n` mandatory items and `m` optional items to be covered
+    /// This allows us to include items which may or may not be covered (but
+    /// still may not be covered more than once)
+    /// 
+    /// Example, where optional elements are after |
+    /// ```text
+    ///     i1  i2  i3  i4 | i5 
+    /// o1   1   0   1  0  |  0
+    /// o2   0   1   0  1  |  0
+    /// o3   1   0   0  0  !  1
+    /// o4   0   0   1  0  |  0
+    /// o5   0   0   1  0  |  1
+    /// ```
+    /// Here we can see taking \[o1,o2\] works, as does \[o2,o3,o4\], but *not*
+    /// \[o2,o3,o5\], because then i4 would be double covered
+    /// 
+    /// The code that does this is
+    /// ```
+    ///# use dlx_rs::solver::Solver;
+    /// 
+    /// let mut s = Solver::new_optional(4,1);
+    /// 
+    /// s.add_option("o1", &[1,3]);
+    /// s.add_option("o2", &[2,4]);
+    /// s.add_option("o3", &[1,5]);
+    /// s.add_option("o4", &[3]);
+    /// s.add_option("o5", &[3,5]);
+    /// 
+    /// let s1 = s.next().unwrap();
+    /// let s2 = s.next().unwrap();
+    /// let s3 = s.next();
+    /// assert_eq!(s1,["o2","o1"]);
+    /// assert_eq!(s2,["o2","o3","o4"]);
+    /// assert_eq!(s3,None);
+    /// ```
+    /// 
+    pub fn new_optional( mandatory: Index, opt: Index) -> Self {
+        // optional stores the index where the optional parameters begin: this
+        // is required for both checking completeness of solution (in step X2)
+        // and also in choosing MRV (step X3)
+        let optional = mandatory+1;
+        let n = mandatory+opt;
         // First add null at element 0 (allows us to traverse items list)
         let mut elements: Vec<Box<dyn Link>> = vec![Box::new(Item {
             ulink: 0,
@@ -304,6 +350,7 @@ impl Solver {
         elements.push(Box::new(spacer));
 
         Solver {
+            optional,
             elements,
             items: n,
             options: HashMap::new(),
@@ -319,7 +366,7 @@ impl Solver {
 
     /// Adds an option which would cover items defined by `option`, and with name `name
     /// Specifically if our problems looks like
-    /// 
+    ///
     /// ```text
     /// i0  ⟷  i1  ⟷  i2  ⟷  i3  ⟷  i4
     ///        ⥯      ⥯     ⥯     ⥯   s0
@@ -386,7 +433,7 @@ impl Solver {
 
     /// Covers item in column `i`
     /// i.e. `cover(2)` would transform
-    /// 
+    ///
     /// ```text
     /// i0  ⟷  i1  ⟷  i2  ⟷  i3  ⟷  i4
     ///        ⥯      ⥯     ⥯     ⥯   s0
@@ -397,7 +444,7 @@ impl Solver {
     ///        ⥯      ⥯     ⥯     ⥯
     /// ```
     /// into
-    /// 
+    ///
     /// ```text
     /// i0  ⟷  i1  ⟷  ⟷  ⟷  i3  ⟷  i4
     ///        ⥯            ⥯     ⥯   s0
@@ -547,17 +594,15 @@ impl Solver {
     }
 
     pub fn output(&self) -> Vec<String> {
-
-                let to_return = self
-                    .sol_vec
-                    .iter()
-                    .take(self.l)
-                    .map(|&x| self.spacer_for(x))
-                    .map(|x| self.spacer_ids[&x])
-                    .map(|x| self.names[x].clone())
-                    .collect();
-                    to_return
-
+        let to_return = self
+            .sol_vec
+            .iter()
+            .take(self.l)
+            .map(|&x| self.spacer_for(x))
+            .map(|x| self.spacer_ids[&x])
+            .map(|x| self.names[x].clone())
+            .collect();
+        to_return
     }
 
     /// Stage X2 of Algorithm X
@@ -567,7 +612,7 @@ impl Solver {
         //println!("State:");
         //println!("{}",self);
         //println!("RLINK: {}",self.elements[0].r());
-        if self.elements[0].r() == 0 {
+        if self.elements[0].r() == 0  || self.elements[0].r() >= self.optional {
             if self.yielding {
                 self.yielding = false;
                 return Some(self.output());
@@ -594,7 +639,7 @@ impl Solver {
         let mut idx = self.elements[0].r();
         let mut min_idx = self.elements[0].r();
         let mut min_l = self.elements[idx].get_l();
-        while idx != 0 {
+        while idx != 0 && idx < self.optional {
             let l = self.elements[idx].get_l();
             if l < min_l {
                 min_l = l;
@@ -730,7 +775,7 @@ impl Solver {
         }
     }
 
-    pub fn spacer_for(&self, x: Index) -> Index {
+    fn spacer_for(&self, x: Index) -> Index {
         let mut p = x;
         loop {
             match self.elements[p].link_type() {
@@ -741,6 +786,41 @@ impl Solver {
         }
     }
 
+    /// Selects an option with the name `name` When setting up a general
+    /// constraint solution, this is how to search for specific answers e.g. a
+    /// Sudoku has all the constraints (items and options), and then the squares
+    /// filled out in the specific problem need to be selected
+    /// 
+    /// So for the problem
+    /// 
+    /// ```text
+    ///    i1  i2  i3
+    /// o1  1   0   0 
+    /// o2  1   0   0
+    /// o3  0   1   1
+    /// ```
+    /// Clearly *both* \[o1,o3\] and \[o2,o3\] are solutions, but if we select o1, then only one solution remains
+    /// 
+    /// ```
+    ///# use dlx_rs::solver::Solver;
+    /// 
+    /// let mut s = Solver::new(3);
+    /// 
+    /// s.add_option("o1",&[1]);
+    /// s.add_option("o2",&[1]);
+    /// s.add_option("o3",&[2,3]);
+    /// 
+    /// // First get all solutions 
+    /// let sols: Vec<Vec<String>> = s.clone().collect();
+    /// assert_eq!( sols.len(), 2);
+    /// assert_eq!( vec!["o3", "o1"], sols[0]);
+    /// assert_eq!( vec!["o3", "o2"], sols[1]);
+    /// 
+    /// 
+    /// // Now select o1 and get all solutions
+    /// s.select("o1");
+    /// assert_eq!( vec!["o3"], s.next().unwrap());
+    /// ```
     pub fn select(&mut self, name: &str) -> Result<(), &'static str> {
         // This selects an option by doing the followings
 
@@ -806,5 +886,4 @@ impl Clone for Box<dyn Link> {
     fn clone(&self) -> Self {
         self.clone_dyn()
     }
-
 }

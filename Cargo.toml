@@ -14,6 +14,10 @@ name = "dlx_rs"
 path = "src/lib.rs"
 
 
+#[[bin]]
+#name = "dlx-rs"
+#path = "src/main.rs"
+
 [dependencies]
 
 

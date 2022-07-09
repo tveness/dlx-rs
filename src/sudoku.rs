@@ -6,14 +6,14 @@ use crate::solver::Solver;
 ///# use dlx_rs::sudoku::Sudoku;
 /// // Define sudoku grid, 0 is unknown number
 /// let sudoku = vec![
-///     5, 3, 0, 0, 7, 0, 0, 0, 0, 
+///     5, 3, 0, 0, 7, 0, 0, 0, 0,
 ///     6, 0, 0, 1, 9, 5, 0, 0, 0,
-///     0, 9, 8, 0, 0, 0, 0, 6, 0, 
-///     8, 0, 0, 0, 6, 0, 0, 0, 3, 
-///     4, 0, 0, 8, 0, 3, 0, 0, 1, 
+///     0, 9, 8, 0, 0, 0, 0, 6, 0,
+///     8, 0, 0, 0, 6, 0, 0, 0, 3,
+///     4, 0, 0, 8, 0, 3, 0, 0, 1,
 ///     7, 0, 0, 0, 2, 0, 0, 0, 6,
-///     0, 6, 0, 0, 0, 0, 2, 8, 0, 
-///     0, 0, 0, 4, 1, 9, 0, 0, 5, 
+///     0, 6, 0, 0, 0, 0, 2, 8, 0,
+///     0, 0, 0, 4, 1, 9, 0, 0, 5,
 ///     0, 0, 0, 0, 8, 0, 0, 7, 9,
 /// ];
 ///
@@ -32,9 +32,9 @@ use crate::solver::Solver;
 ///     3, 4, 5, 2, 8, 6, 1, 7, 9,
 /// ];
 /// // Checks only solution is true solution
-/// for solution in s {
-///     assert_eq!(solution, true_solution);
-/// }
+/// let solution = s.next().unwrap();
+/// assert_eq!(solution, true_solution);
+/// assert_eq!(s.next(), None);
 /// ```
 pub struct Sudoku {
     pub solver: Solver,
@@ -44,7 +44,7 @@ pub struct Sudoku {
 
 impl Sudoku {
     // Initialises the constraints for an n*n sudoku-grid (regular is n=3, as the grid is 9x9)
-    // This corresponds to a matrix with dimension (n**6)x(4*n**4) 
+    // This corresponds to a matrix with dimension (n**6)x(4*n**4)
     pub fn new(n: usize) -> Sudoku {
         // What are the constraints we need to meet?
         // 1. Each cell must contain a number i.e. R1C1 must have precisely one number in it
@@ -123,7 +123,7 @@ impl Sudoku {
         let nsq: usize = inputv.len();
         let n: usize = (nsq as f64).sqrt().sqrt() as usize;
 
-        if nsq!=n*n*n*n{
+        if nsq != n * n * n * n {
             panic!("Input must be an array of length n**4")
         }
         let mut s = Self::new(n);
@@ -152,14 +152,14 @@ impl Iterator for Sudoku {
     ///# use dlx_rs::sudoku::Sudoku;
     /// // Define sudoku grid, 0 is unknown number
     /// let sudoku = vec![
-    ///     5, 3, 0, 0, 7, 0, 0, 0, 0, 
+    ///     5, 3, 0, 0, 7, 0, 0, 0, 0,
     ///     6, 0, 0, 1, 9, 5, 0, 0, 0,
-    ///     0, 9, 8, 0, 0, 0, 0, 6, 0, 
-    ///     8, 0, 0, 0, 6, 0, 0, 0, 3, 
-    ///     4, 0, 0, 8, 0, 3, 0, 0, 1, 
+    ///     0, 9, 8, 0, 0, 0, 0, 6, 0,
+    ///     8, 0, 0, 0, 6, 0, 0, 0, 3,
+    ///     4, 0, 0, 8, 0, 3, 0, 0, 1,
     ///     7, 0, 0, 0, 2, 0, 0, 0, 6,
-    ///     0, 6, 0, 0, 0, 0, 2, 8, 0, 
-    ///     0, 0, 0, 4, 1, 9, 0, 0, 5, 
+    ///     0, 6, 0, 0, 0, 0, 2, 8, 0,
+    ///     0, 0, 0, 4, 1, 9, 0, 0, 5,
     ///     0, 0, 0, 0, 8, 0, 0, 7, 9,
     /// ];
     ///
@@ -177,15 +177,15 @@ impl Iterator for Sudoku {
     ///     2, 8, 7, 4, 1, 9, 6, 3, 5,
     ///     3, 4, 5, 2, 8, 6, 1, 7, 9,
     /// ];
-    /// // Checks solution 
+    /// // Checks solution
     /// let solution =s.next();
     /// assert_eq!(solution, Some(true_solution));
-    /// 
+    ///
     /// let another = s.next();
     /// assert_eq!(another, None);
-    /// 
+    ///
     /// ```
-    /// 
+    ///
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(sol) = self.solver.next() {
             let mut sudoku_solved = self.input.clone();
@@ -202,7 +202,6 @@ impl Iterator for Sudoku {
             None
         }
     }
-
 }
 
 impl Sudoku {
@@ -236,44 +235,42 @@ impl Sudoku {
     ///        ║ 4 1 9 ║     5
     ///        ║   8   ║   7 9
     /// ```
-    /// 
-    /// 
+    ///
+    ///
     pub fn pretty(sudoku_solved: &[usize]) -> String {
         let mut result = String::from("");
-        let n=(sudoku_solved.len() as f64).sqrt().sqrt() as usize;
+        let n = (sudoku_solved.len() as f64).sqrt().sqrt() as usize;
         #[allow(non_snake_case)]
-        let N = n*n;
+        let N = n * n;
         // Print the array in a pretty way
         for i in 0..N {
-            result+=" ";
+            result += " ";
             for j in 0..N {
-                result += &match sudoku_solved[i*N + j] {
+                result += &match sudoku_solved[i * N + j] {
                     0 => String::from(" "),
                     v => v.to_string(),
                 };
-                result+=" ";
+                result += " ";
 
-                if (j+1)%n==0 && j<N-1 {
-                    result+="║ ";
+                if (j + 1) % n == 0 && j < N - 1 {
+                    result += "║ ";
                 }
             }
-            if i<N-1{
-            result+= "\n";
+            if i < N - 1 {
+                result += "\n";
             }
-                if (i+1)%n == 0 && i<N-1{
-                    result += &("═".repeat(2*n+1));
-                    for _ in 1..n {
+            if (i + 1) % n == 0 && i < N - 1 {
+                result += &("═".repeat(2 * n + 1));
+                for _ in 1..n {
                     result += "╬";
-                    result+=&("═".repeat(2*n+1));
-                    }
-                    result+="\n";
-
+                    result += &("═".repeat(2 * n + 1));
                 }
+                result += "\n";
+            }
         }
         result
-        }
     }
-
+}
 
 #[cfg(test)]
 mod test {
@@ -297,5 +294,4 @@ mod test {
         let sol = s.next().unwrap();
         assert_eq!(sol, true_solution);
     }
-
 }
