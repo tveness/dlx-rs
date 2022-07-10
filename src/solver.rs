@@ -79,6 +79,10 @@ pub struct Solver {
     stage: Stage,
     optional: Index,
 }
+
+/// enum used to determine which stage of the algorithm we are in
+///
+/// This approach avoids recursive function calls which, in very large problems, can cause a stack overflow
 #[derive(Clone)]
 enum Stage {
     X2,
@@ -475,6 +479,7 @@ impl Solver {
         Ok(())
     }
 
+    /// Unlinks an item from the horizontally linked list
     fn unlink_item(&mut self, i: Index) {
         let l = self.elements[i].l();
         let r = self.elements[i].r();
@@ -482,6 +487,9 @@ impl Solver {
         self.elements[r].set_l(l);
     }
 
+    /// Relinks an item into the horizontally linked list
+    ///
+    /// Must be done in the reverse order to unlinking
     fn relink_item(&mut self, i: Index) {
         let l = self.elements[i].l();
         let r = self.elements[i].r();
@@ -489,6 +497,8 @@ impl Solver {
         self.elements[r].set_l(i);
     }
 
+    /// When selecting an option, this runs through all of the items it covers
+    /// and unlinks those OptionElements vertically
     fn hide(&mut self, p: Index) -> Result<(), &'static str> {
         let mut q = p + 1;
         while q != p {
@@ -537,6 +547,7 @@ impl Solver {
         Ok(())
     }
 
+    /// Reverse of function [hide](crate::solver::Solver::hide)
     fn unhide(&mut self, p: Index) -> Result<(), &'static str> {
         let mut q = p - 1;
         while q != p {
@@ -559,9 +570,13 @@ impl Solver {
         Ok(())
     }
 
+    /// Implements algorithm X as a finite state machine
     #[allow(dead_code)]
     pub fn solve(&mut self) -> Option<Vec<String>> {
         // Follows stages of algorithm description in Fasc 5c, Knuth
+
+        // The only ways to break this loop are to yield a solution via X2 or to
+        // have exhausted all solutions via X8
         loop {
             match self.stage {
                 Stage::X2 => match self.x2() {
@@ -585,12 +600,17 @@ impl Solver {
                 },
             };
         }
-
-        //        None
-
-        //        self.x2()
     }
 
+    /// Returns a solution in a human-understandable form
+    ///
+    /// The solution vector `sol_vec` stores each of the OptionElements which
+    /// were used to cover the items in the solution.  To turn this into
+    /// something understandable we find the spacer to its right, and use this
+    /// with a lookup table created earlier to map this to the names of options
+    ///
+    // TODO: Is it useful to have the double map? We don't used spacer_ids for
+    //       anything else, so could condense it into a single HashMap
     pub fn output(&self) -> Vec<String> {
         let to_return = self
             .sol_vec
@@ -664,8 +684,8 @@ impl Solver {
 
         self.stage = Stage::X5;
         None
-        //        self.x5()
     }
+
     /// Stages X5 and X7 of Algorithm X
     ///
     /// Try x_l
@@ -727,7 +747,6 @@ impl Solver {
         self.l += 1;
         self.stage = Stage::X2;
         None
-        //self.x2()
     }
 
     /// Stage X6 of Algorithm X
@@ -754,7 +773,6 @@ impl Solver {
 
         self.stage = Stage::X5;
         None
-        //        self.x5()
     }
 
     /// Stage X8 of Algorithm X
@@ -768,11 +786,12 @@ impl Solver {
                 self.l -= 1;
                 self.stage = Stage::X6;
                 true
-                //                self.x6()
             }
         }
     }
 
+    /// Takes in a non-item node and steps rightwards along `self.elements` the
+    /// until a spacer is found, upon which the index is returned
     fn spacer_for(&self, x: Index) -> Index {
         let mut p = x;
         loop {
@@ -883,5 +902,47 @@ impl Iterator for Solver {
 impl Clone for Box<dyn Link> {
     fn clone(&self) -> Self {
         self.clone_dyn()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn spacer_for() {
+        let mut s = Solver::new(4);
+        s.add_option("o1", &[1, 2]);
+        s.add_option("o2", &[2, 3]);
+        s.add_option("o3", &[3, 4]);
+        s.add_option("o4", &[1, 4]);
+
+        // This creates a vec which looks like
+        // [i0, i1, i2, i3, i4, s0
+        //      x    x          s1
+        //           x   x      s2
+        //               x   x  s3
+        //      x            x  s4]
+        //
+
+        let spacer_answers = HashMap::from([
+            (6, 8),
+            (7, 8),
+            (8, 8),
+            (9, 11),
+            (10, 11),
+            (11, 11),
+            (12, 14),
+            (13, 14),
+            (14, 14),
+            (15, 17),
+            (16, 17),
+            (17, 17),
+        ]);
+
+        for i in 6..=17 {
+            assert_eq!(s.spacer_for(i), spacer_answers[&i]);
+        }
     }
 }

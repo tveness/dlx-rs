@@ -117,7 +117,9 @@ impl Sudoku {
         }
     }
 
-    /// Initialises an appropriately sized Sudoku with all of the correct constraints, and then selects all of the options corresponding the the non-zero entires in `input`
+    /// Initialises an appropriately sized Sudoku with all of the correct
+    /// constraints, and then selects all of the options corresponding the the
+    /// non-zero entires in `input`
     pub fn new_from_input(input: &[usize]) -> Self {
         let inputv = input.to_vec();
         let nsq: usize = inputv.len();
