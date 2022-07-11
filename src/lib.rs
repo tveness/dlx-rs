@@ -13,12 +13,27 @@
 //!
 //! ## Setting up a general constraint problem
 //!
-//! A constraint problem may be expressed in terms of a number of items \[i1,...,i_N\] and options \[o1,...,o_M\].
+//! A constraint problem may be expressed in terms of a number of items \[i_1,...,i_N\] and options \[o_1,...,o_M\].
 //! Each of the options "covers" some of the items, e.g. picking option o1 might involve selecting items i1, i5, and i7.
 //! The constraint problem is to find a collection of options which cover all of the items exactly once.
 //!
-//! We can do this in code as
+//! This can be expressed in terms of a matrix, where each option covers the
+//! items for which the corresponding entry is 1, and doesn't if it is 0
+//! ```text
+//!      i1  i2  i3  i4  i5  i6  i7
+//!  o1   0   0   1   0   1   0   0
+//!  o2   1   0   0   1   0   0   0
+//!  o3   0   1   1   0   0   0   0
+//!  o4   1   0   0   1   0   1   0
+//!  o5   0   1   0   0   0   0   1
+//!  o6   0   0   0   1   1   0   1
+//! ```
+//! The exact cover problem is that of finding a collection of options such that
+//! a 1 appears exactly once in each column.
 //!
+//! This is achieved in the case above by selecting options \[o_1,o_4,o_5\].
+//!
+//! The code to solve this is
 //! ```
 //! use dlx_rs::Solver;
 //! let mut s = Solver::new(7);

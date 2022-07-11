@@ -13,13 +13,12 @@ readme = "README.md"
 name = "dlx_rs"
 path = "src/lib.rs"
 
+[dev-dependencies]
+criterion="0.3.6"
 
-#[[bin]]
-#name = "dlx-rs"
-#path = "src/main.rs"
-
-[dependencies]
-
+[[bench]]
+name = "dlx-benches"
+harness = false
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]

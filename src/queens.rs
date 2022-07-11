@@ -16,14 +16,14 @@ pub struct Queens {
 }
 
 impl Queens {
-    /// Creates new `Queens` set up with constraints for the N queens problem
+    /// Creates new `Queens` set up with constraints for the `n` queens problem
     pub fn new(n: usize) -> Queens {
         // Create blank solver
 
         // Add constraints
 
         // What are the constraints?
-        // We are putting N queens on a chess board
+        // We are putting N queens on an NxN chess board
 
         // 1. Each of the N columns must have exactly 1 queen on it
         // 2. Each of the N rows must have exactly 1 queen on it
@@ -76,17 +76,5 @@ impl Iterator for Queens {
         } else {
             None
         }
-    }
-}
-
-#[cfg(test)]
-mod test {
-
-    use super::*;
-    #[test]
-    fn test_queens() {
-        let q8 = Queens::new(8);
-        let n8 = q8.count();
-        println!("N8: {}", n8);
     }
 }
