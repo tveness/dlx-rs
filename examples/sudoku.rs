@@ -9,7 +9,7 @@ fn main() {
     ];
     println!("Input:");
     println!("{}", Sudoku::pretty(&sudoku));
-    println!("");
+    println!();
     let s = Sudoku::new_from_input(&sudoku);
     for solution in s {
         println!("Solution:");

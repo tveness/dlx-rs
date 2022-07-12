@@ -1,5 +1,9 @@
 # dlx_rs
 
+[![Documentation](https://docs.rs/dlx-rs/badge.svg)](https://docs.rs/dlx-rs/)
+[![Crates.io](https://img.shields.io/crates/v/dlx-rs.svg)](https://crates.io/crates/dlx-rs)
+[![Build status](https://github.com/tveness/dlx-rs/workflows/CI/badge.svg)](https://github.com/tveness/dlx-rs/actions/workflows/rust.yml)
+
  dlx_rs is a  Rust library for solving exact cover/constraint problems
  problems using Knuth's [Dancing Links](https://en.wikipedia.org/wiki/Dancing_Links) (DLX) algorithm.
 

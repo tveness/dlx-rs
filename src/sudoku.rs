@@ -240,7 +240,7 @@ impl Sudoku {
     ///
     ///
     pub fn pretty(sudoku_solved: &[usize]) -> String {
-        let mut result = String::from("");
+        let mut result = String::new();
         let n = (sudoku_solved.len() as f64).sqrt().sqrt() as usize;
         #[allow(non_snake_case)]
         let N = n * n;
