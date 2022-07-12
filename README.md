@@ -39,7 +39,7 @@
  This is achieved in the case above by selecting options \[o_1,o_4,o_5\].
 
  The code to solve this is
- ```
+ ```rust
  use dlx_rs::Solver;
  let mut s = Solver::new(7);
  s.add_option("o1",&[3,5]);
@@ -57,7 +57,7 @@
  ## Solving a Sudoku
 
 
- ```
+ ```rust
  use dlx_rs::Sudoku;
  // Define sudoku grid, 0 is unknown number
  let sudoku = vec![
