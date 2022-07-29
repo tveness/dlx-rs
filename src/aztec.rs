@@ -9,21 +9,27 @@ enum Color {
     Black,
 }
 
-/// Finds solutions to Aztec diamond problem
-///
+/// Finds all solutions to Aztec diamond problem
+/// ```
+///# use dlx_rs::aztec::Aztec;
+/// for n in 1..=5 {
+///     let az = Aztec::new(n);
+///     assert_eq!(az.count(), 1 << (n*(n+1)/2));
+/// }
+/// ```
 pub struct Aztec {
     n: usize,
     pub solver: Solver,
 }
 
 impl Aztec {
-    /// Creates new `Queens` set up with constraints for the `n` queens problem
+    /// Creates new `Aztec` set up with constraints for the order `n` Aztec diamond
     pub fn new(n: usize) -> Aztec {
         // Create blank solver
 
         // Only constraint is that each square must be covered, and there are
 
-        // (1+2+...+n)*4 = 2*n*(n+1) squares for the order n Aztec diamon
+        // (1+2+...+n)*4 = 2*n*(n+1) squares for the order n Aztec diamond
 
         // Squares are laid out sequentially in memory running left to right from the top down i.e.
 
