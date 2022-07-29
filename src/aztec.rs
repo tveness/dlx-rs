@@ -19,7 +19,7 @@ enum Color {
 /// ```
 pub struct Aztec {
     n: usize,
-    pub solver: Solver,
+    solver: Solver,
 }
 
 impl Aztec {
@@ -110,6 +110,7 @@ impl Aztec {
         Aztec { solver, n }
     }
 
+    /// Prints a solution using ANSI colour codes on the terminal
     pub fn pretty_print_sol(sol: &[(usize, usize)]) {
         let n = (sol.len() as f64).sqrt() as usize;
         //        println!("N: {}",n);
@@ -167,11 +168,11 @@ impl Aztec {
         print!("{}", rr);
         for i in 0..solc.len() {
             match solc[i] {
-                Color::Red => print!("\x1b[41m \x1b[0m"),
-                Color::Green => print!("\x1b[42m \x1b[0m"),
-                Color::Yellow => print!("\x1b[43m \x1b[0m"),
-                Color::Blue => print!("\x1b[44m \x1b[0m"),
-                Color::Black => print!("\x1b[40m \x1b[0m"),
+                Color::Red => print!("\x1b[31;41mX\x1b[0m"),
+                Color::Green => print!("\x1b[32;42mX\x1b[0m"),
+                Color::Yellow => print!("\x1b[33;43mX\x1b[0m"),
+                Color::Blue => print!("\x1b[34;44mX\x1b[0m"),
+                Color::Black => print!("\x1b[30;40mX\x1b[0m"),
             };
 
             if row_ends_set.contains(&(i + 1)) {

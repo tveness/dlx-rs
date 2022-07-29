@@ -12,7 +12,7 @@ fn main() {
     println!("Number of solutions for n={}: {}", n, na);
 
     // Get a random solution
-    let mut a = Aztec::new(n);
+    let a = Aztec::new(n);
     let mut rng = rand::thread_rng();
     let s = a.choose(&mut rng).unwrap();
 
