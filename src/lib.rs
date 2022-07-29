@@ -7,6 +7,7 @@
 //!
 //! * arbitrary Sudokus
 //! * N queens problem
+//! * Aztec diamond
 //! * Pentomino tilings (TODO)
 //! * graph colouring (TODO)
 //!
@@ -89,10 +90,12 @@
 //!
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
+pub mod aztec;
 pub mod queens;
 pub mod solver;
 pub mod sudoku;
 
+pub use crate::aztec::Aztec;
 pub use crate::queens::Queens;
 pub use crate::solver::Solver;
 pub use crate::sudoku::Sudoku;

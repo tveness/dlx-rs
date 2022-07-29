@@ -15,6 +15,7 @@ path = "src/lib.rs"
 
 [dev-dependencies]
 criterion="0.3.6"
+rand = "0.8.5"
 
 [[bench]]
 name = "dlx-benches"
