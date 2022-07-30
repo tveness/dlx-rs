@@ -4,7 +4,9 @@ use rand::seq::IteratorRandom;
 // Solve the Aztec diamond of order n
 
 fn main() {
-    let n = 4;
+
+    for n in 1..=4 {
+    //let n = 4;
 
     // First, count all of the solutions
     let a = Aztec::new(n);
@@ -17,4 +19,5 @@ fn main() {
     let s = a.choose(&mut rng).unwrap();
 
     Aztec::pretty_print_sol(&s);
+    }
 }
