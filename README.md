@@ -12,6 +12,7 @@
 
  * arbitrary Sudokus
  * N queens problem
+ * Aztec diamond
  * Pentomino tilings (TODO)
  * graph colouring (TODO)
 

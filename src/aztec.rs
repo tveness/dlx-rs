@@ -14,6 +14,7 @@ enum Color {
 ///# use dlx_rs::aztec::Aztec;
 /// for n in 1..=5 {
 ///     let az = Aztec::new(n);
+///     // Check number of solutions is equal to 2^(n*(n+1)/2)
 ///     assert_eq!(az.count(), 1 << (n*(n+1)/2));
 /// }
 /// ```
@@ -59,10 +60,6 @@ impl Aztec {
         let row_ends = row_ends_top.chain(row_ends_bottom);
         let row_ends_set: HashSet<usize> = HashSet::from_iter(row_ends);
 
-        //            println!("Row ends: ");
-        //       for r in row_ends_set.clone() {
-        //          print!("{} ", r);
-        //     }
         println!();
 
         // Horizontal dominoes
@@ -73,8 +70,6 @@ impl Aztec {
                 let pos2 = pos1 + 1;
                 let con_name = format!("H{}#{}", pos1, pos2);
                 solver.add_option(&con_name, &[pos1, pos2]);
-
-                // Now rotate these positions one quarter turn to the right to pick up vertical dominos
             }
         }
 
@@ -111,9 +106,17 @@ impl Aztec {
     }
 
     /// Prints a solution using ANSI colour codes on the terminal
+    /// ```
+    ///# use dlx_rs::aztec::Aztec;
+    /// let n = 5;
+    /// let az = Aztec::new(n);
+    /// for sol in az {
+    ///     Aztec::pretty_print_sol(&sol);
+    /// }
+    /// ```
     pub fn pretty_print_sol(sol: &[(usize, usize)]) {
+        // Gets n from length of solution
         let n = (sol.len() as f64).sqrt() as usize;
-        //        println!("N: {}",n);
         let max = 2 * n * (n + 1);
 
         // Construct positions at end of row
@@ -122,9 +125,6 @@ impl Aztec {
 
         let row_ends = row_ends_top.chain(row_ends_bottom);
         let row_ends_set: HashSet<usize> = HashSet::from_iter(row_ends);
-        //       println!("{:?}", row_ends_set);
-
-        //        println!("Printing pretty sol");
 
         let mut solc: Vec<Color> = Vec::with_capacity(2 * sol.len());
         for _ in 1..=2 * sol.len() {
@@ -167,6 +167,7 @@ impl Aztec {
 
         print!("{}", rr);
         for i in 0..solc.len() {
+            // Print appropriate colour
             match solc[i] {
                 Color::Red => print!("\x1b[31;41mX\x1b[0m"),
                 Color::Green => print!("\x1b[32;42mX\x1b[0m"),
@@ -175,6 +176,7 @@ impl Aztec {
                 Color::Black => print!("\x1b[30;40mX\x1b[0m"),
             };
 
+            // Padding for each row, decrease padding until row `n`, then increase again
             if row_ends_set.contains(&(i + 1)) {
                 if row_dir {
                     row_pad -= 1;
