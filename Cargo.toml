@@ -1,6 +1,6 @@
 [package]
 name = "dlx-rs"
-version = "0.0.3"
+version = "1.0.0"
 edition = "2021"
 license = "CC0-1.0"
 description = "Implementation of dancing links in Rust"
@@ -14,7 +14,7 @@ name = "dlx_rs"
 path = "src/lib.rs"
 
 [dev-dependencies]
-criterion="0.3.6"
+criterion = { version = "0.4.0", features = ["html_reports"] }
 rand = "0.8.5"
 
 [[bench]]
