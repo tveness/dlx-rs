@@ -2,26 +2,27 @@ use std::collections::HashMap;
 use std::fmt;
 type Index = usize;
 
-enum LinkType {
-    Spacer,
-    Item,
-    OptionElement,
+#[derive(Clone, Debug)]
+enum Link {
+    Spacer(Spacer),
+    Item(Item),
+    OptionElement(OptionElement),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct OptionElement {
     ulink: Index,
     dlink: Index,
     top: Index,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Spacer {
     ulink: Index,
     dlink: Index,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Item {
     ulink: Index,
     dlink: Index,
@@ -67,7 +68,7 @@ struct Item {
 /// ```
 #[derive(Clone)]
 pub struct Solver {
-    elements: Vec<Box<dyn Link>>,
+    elements: Vec<Link>,
     items: Index,
     options: HashMap<Index, Vec<Index>>,
     l: usize,
@@ -113,13 +114,13 @@ impl fmt::Display for Solver {
         //        println!("Linked items: {:?}",linked_items.keys());
 
         for i in self.elements.iter().skip(1 + self.items) {
-            match i.link_type() {
-                LinkType::Item => {}
-                LinkType::Spacer => {
+            match *i {
+                Link::Item(_) => {}
+                Link::Spacer(_) => {
                     writeln!(f).unwrap();
                     last_col = 0;
                 }
-                LinkType::OptionElement => {
+                Link::OptionElement(_) => {
                     if let Some(&cur_col) = linked_items.get(&i.top()) {
                         //    println!("Cur_col: {}, last col: {}", cur_col, last_col);
                         let del = 2 * (1 + cur_col - last_col);
@@ -134,140 +135,99 @@ impl fmt::Display for Solver {
         write!(f, "")
     }
 }
-trait Link {
-    fn u(&self) -> Index;
-    fn d(&self) -> Index;
-    fn r(&self) -> Index;
-    fn l(&self) -> Index;
-    fn set_u(&mut self, u: Index);
-    fn set_d(&mut self, d: Index);
-    fn set_r(&mut self, u: Index);
-    fn set_l(&mut self, d: Index);
-    fn link_type(&self) -> LinkType;
-    fn top(&self) -> Index;
-    fn inc_l(&mut self);
-    fn dec_l(&mut self);
-    fn get_l(&self) -> usize;
-    fn clone_dyn(&self) -> Box<dyn Link>;
+impl Link {
+    fn u(&self) -> Index {
+        match self {
+            Link::Spacer(x) => x.ulink,
+            Link::OptionElement(x) => x.ulink,
+            Link::Item(x) => x.ulink,
+        }
+    }
+    fn d(&self) -> Index {
+        match self {
+            Link::Spacer(x) => x.dlink,
+            Link::OptionElement(x) => x.dlink,
+            Link::Item(x) => x.dlink,
+        }
+    }
+    fn r(&self) -> Index {
+        match self {
+            Link::Spacer(_) => 0,
+            Link::OptionElement(_) => 0,
+            Link::Item(x) => x.rlink,
+        }
+    }
+    fn l(&self) -> Index {
+        match self {
+            Link::Spacer(_) => 0,
+            Link::OptionElement(_) => 0,
+            Link::Item(x) => x.llink,
+        }
+    }
+    fn set_u(&mut self, u: Index) {
+        match self {
+            Link::Spacer(x) => x.ulink = u,
+            Link::OptionElement(x) => x.ulink = u,
+            Link::Item(x) => x.ulink = u,
+        }
+    }
+    fn set_d(&mut self, d: Index) {
+        match self {
+            Link::Spacer(x) => x.dlink = d,
+            Link::OptionElement(x) => x.dlink = d,
+            Link::Item(x) => x.dlink = d,
+        }
+    }
+    fn set_r(&mut self, u: Index) {
+        match self {
+            Link::Spacer(_) => {}
+            Link::OptionElement(_) => {}
+            Link::Item(x) => x.rlink = u,
+        }
+    }
+    fn set_l(&mut self, d: Index) {
+        match self {
+            Link::Spacer(_) => {}
+            Link::OptionElement(_) => {}
+            Link::Item(x) => x.llink = d,
+        }
+    }
+    fn top(&self) -> Index {
+        match self {
+            Link::Spacer(_) => 0,
+            Link::OptionElement(x) => x.top,
+            Link::Item(_) => 0,
+        }
+    }
+    fn inc_l(&mut self) {
+        match self {
+            Link::Spacer(_) => {}
+            Link::OptionElement(_) => {}
+            Link::Item(x) => x.l += 1,
+        }
+    }
+    fn dec_l(&mut self) {
+        match self {
+            Link::Spacer(_) => {}
+            Link::OptionElement(_) => {}
+            Link::Item(x) => x.l -= 1,
+        }
+    }
+    fn get_l(&self) -> usize {
+        match self {
+            Link::Spacer(_) => 0,
+            Link::OptionElement(_) => 0,
+            Link::Item(x) => x.l,
+        }
+    }
 }
-
+/*
 impl Link for Spacer {
     fn clone_dyn(&self) -> Box<dyn Link> {
         Box::new(self.clone())
     }
-    fn r(&self) -> Index {
-        0
-    }
-    fn l(&self) -> Index {
-        0
-    }
-    fn u(&self) -> Index {
-        self.ulink
-    }
-    fn d(&self) -> Index {
-        self.dlink
-    }
-    fn set_r(&mut self, _u: Index) {}
-    fn set_l(&mut self, _u: Index) {}
-    fn set_u(&mut self, u: Index) {
-        self.ulink = u;
-    }
-    fn set_d(&mut self, d: Index) {
-        self.dlink = d;
-    }
-    fn link_type(&self) -> LinkType {
-        LinkType::Spacer
-    }
-    fn top(&self) -> Index {
-        0
-    }
-    fn inc_l(&mut self) {}
-    fn dec_l(&mut self) {}
-    fn get_l(&self) -> usize {
-        0
-    }
 }
-impl Link for OptionElement {
-    fn clone_dyn(&self) -> Box<dyn Link> {
-        Box::new(self.clone())
-    }
-    fn set_r(&mut self, _u: Index) {}
-    fn set_l(&mut self, _u: Index) {}
-    fn r(&self) -> Index {
-        0
-    }
-    fn l(&self) -> Index {
-        0
-    }
-    fn d(&self) -> Index {
-        self.dlink
-    }
-    fn u(&self) -> Index {
-        self.ulink
-    }
-    fn set_u(&mut self, u: Index) {
-        self.ulink = u;
-    }
-    fn set_d(&mut self, d: Index) {
-        self.dlink = d;
-    }
-    fn link_type(&self) -> LinkType {
-        LinkType::OptionElement
-    }
-    fn top(&self) -> Index {
-        self.top
-    }
-    fn inc_l(&mut self) {}
-    fn dec_l(&mut self) {}
-    fn get_l(&self) -> usize {
-        0
-    }
-}
-impl Link for Item {
-    fn clone_dyn(&self) -> Box<dyn Link> {
-        Box::new(self.clone())
-    }
-    fn r(&self) -> Index {
-        self.rlink
-    }
-    fn l(&self) -> Index {
-        self.llink
-    }
-    fn d(&self) -> Index {
-        self.dlink
-    }
-    fn u(&self) -> Index {
-        self.ulink
-    }
-    fn set_u(&mut self, u: Index) {
-        self.ulink = u;
-    }
-    fn set_d(&mut self, d: Index) {
-        self.dlink = d;
-    }
-    fn set_r(&mut self, u: Index) {
-        self.rlink = u
-    }
-    fn set_l(&mut self, u: Index) {
-        self.llink = u
-    }
-    fn link_type(&self) -> LinkType {
-        LinkType::Item
-    }
-    fn top(&self) -> Index {
-        0
-    }
-
-    fn inc_l(&mut self) {
-        self.l += 1;
-    }
-    fn dec_l(&mut self) {
-        self.l -= 1;
-    }
-    fn get_l(&self) -> usize {
-        self.l
-    }
-}
+*/
 
 impl Solver {
     /// Returns a solver with `n` items, all of which must be covered exactly
@@ -319,7 +279,7 @@ impl Solver {
         let optional = mandatory + 1;
         let n = mandatory + opt;
         // First add null at element 0 (allows us to traverse items list)
-        let mut elements: Vec<Box<dyn Link>> = vec![Box::new(Item {
+        let mut elements: Vec<Link> = vec![Link::Item(Item {
             ulink: 0,
             dlink: 0,
             rlink: 1,
@@ -333,7 +293,7 @@ impl Solver {
                 _ if i == n => 0,
                 _ => panic!("Invalid index"),
             };
-            elements.push(Box::new(Item {
+            elements.push(Link::Item(Item {
                 ulink: i,
                 dlink: i,
                 llink: i - 1,
@@ -345,11 +305,11 @@ impl Solver {
         // Add first spacer
         let spacer_index = elements.len();
         assert_eq!(spacer_index, n + 1);
-        let spacer = Spacer {
+        let spacer = Link::Spacer(Spacer {
             ulink: spacer_index,
             dlink: spacer_index,
-        };
-        elements.push(Box::new(spacer));
+        });
+        elements.push(spacer);
 
         Solver {
             optional,
@@ -402,13 +362,13 @@ impl Solver {
             self.elements[new_ulink].set_d(new_id);
             self.elements[item_id].set_u(new_id);
             self.elements[item_id].inc_l();
-            let new_node = OptionElement {
+            let new_node = Link::OptionElement(OptionElement {
                 ulink: new_ulink,
                 dlink: item_id,
                 top: item_id,
-            };
+            });
 
-            self.elements.push(Box::new(new_node));
+            self.elements.push(new_node);
         }
 
         //Add spacer at the end
@@ -416,11 +376,11 @@ impl Solver {
         let spacer_index = self.elements.len();
         let root_spacer_index = self.items + 1;
         let bottom_spacer_index = self.elements[root_spacer_index].u();
-        let new_spacer = Spacer {
+        let new_spacer = Link::Spacer(Spacer {
             dlink: root_spacer_index,
             ulink: bottom_spacer_index,
-        };
-        self.elements.push(Box::new(new_spacer));
+        });
+        self.elements.push(new_spacer);
         // Patch old spacers
         //Old bottom dlink = new spacer
         self.elements[bottom_spacer_index].set_d(spacer_index);
@@ -458,8 +418,8 @@ impl Solver {
     /// ```
     pub fn cover(&mut self, i: Index) -> Result<(), &'static str> {
         let col = &mut self.elements[i];
-        match col.link_type() {
-            LinkType::Item => {}
+        match col {
+            Link::Item(_) => {}
             _ => return Err("Can only cover items"),
         };
         // Hide all of the options in col i
@@ -506,10 +466,10 @@ impl Solver {
             let u = self.elements[q].u();
             let d = self.elements[q].d();
 
-            match self.elements[q].link_type() {
-                LinkType::Item => return Err("Hide encountered and item"),
-                LinkType::Spacer => q = u,
-                LinkType::OptionElement => {
+            match self.elements[q] {
+                Link::Item(_) => return Err("Hide encountered and item"),
+                Link::Spacer(_) => q = u,
+                Link::OptionElement(_) => {
                     self.elements[u].set_d(d);
                     self.elements[d].set_u(u);
                     self.elements[x].dec_l();
@@ -532,8 +492,8 @@ impl Solver {
 
         let col = &mut self.elements[i];
 
-        match col.link_type() {
-            LinkType::Item => {}
+        match col {
+            Link::Item(_) => {}
             _ => return Err("Can only uncover items"),
         };
 
@@ -555,10 +515,10 @@ impl Solver {
             let u = self.elements[q].u();
             let d = self.elements[q].d();
 
-            match self.elements[q].link_type() {
-                LinkType::Item => return Err("Hide encountered and item"),
-                LinkType::Spacer => q = d,
-                LinkType::OptionElement => {
+            match self.elements[q] {
+                Link::Item(_) => return Err("Hide encountered and item"),
+                Link::Spacer(_) => q = d,
+                Link::OptionElement(_) => {
                     self.elements[u].set_d(q);
                     self.elements[d].set_u(q);
                     self.elements[x].inc_l();
@@ -579,10 +539,11 @@ impl Solver {
         // have exhausted all solutions via X8
         loop {
             match self.stage {
-                Stage::X2 => match self.x2() {
-                    Some(z) => return Some(z),
-                    None => {}
-                },
+                Stage::X2 => {
+                    if let Some(z) = self.x2() {
+                        return Some(z);
+                    }
+                }
                 Stage::X3 => {
                     self.x3x4();
                 }
@@ -720,24 +681,22 @@ impl Solver {
         let mut p = x_l + 1;
         while p != x_l {
             //            println!("p: {}", p);
-            let jt = self.elements[p].link_type();
 
-            let j = self.elements[p].top();
-
-            match jt {
-                LinkType::Spacer => {
+            match &self.elements[p] {
+                Link::Spacer(_) => {
                     // If a spacer, then hop up one link
                     p = self.elements[p].u();
                 }
-                LinkType::OptionElement => {
+                op @ Link::OptionElement(_) => {
                     //                    println!("Covering X5: {}", j);
                     //                    println!("State:");
                     //                    println!("{}", self);
+                    let j = op.top();
 
                     self.cover(j).unwrap();
                 }
-                LinkType::Item => {
-                    panic!("Trying an item {}", j);
+                Link::Item(x) => {
+                    panic!("Trying an item {:?}", x);
                 }
             };
             p += 1;
@@ -795,10 +754,10 @@ impl Solver {
     fn spacer_for(&self, x: Index) -> Index {
         let mut p = x;
         loop {
-            match self.elements[p].link_type() {
-                LinkType::Spacer => return p,
-                LinkType::OptionElement => p += 1,
-                LinkType::Item => panic!("Somehow ended up on an item"),
+            match self.elements[p] {
+                Link::Spacer(_) => return p,
+                Link::OptionElement(_) => p += 1,
+                Link::Item(_) => panic!("Somehow ended up on an item"),
             };
         }
     }
@@ -873,13 +832,13 @@ impl Solver {
         let mut p = spacer_id + 1;
 
         loop {
-            match self.elements[p].link_type() {
-                LinkType::OptionElement => {
+            match self.elements[p] {
+                Link::OptionElement(_) => {
                     self.cover(self.elements[p].top()).unwrap();
                     p += 1;
                 }
-                LinkType::Spacer => break,
-                LinkType::Item => break,
+                Link::Spacer(_) => break,
+                Link::Item(_) => break,
             };
         }
 
@@ -896,12 +855,6 @@ impl Iterator for Solver {
     /// `None` when no more solutions remaining
     fn next(&mut self) -> Option<Self::Item> {
         self.solve()
-    }
-}
-
-impl Clone for Box<dyn Link> {
-    fn clone(&self) -> Self {
-        self.clone_dyn()
     }
 }
 
