@@ -1,12 +1,19 @@
 #[macro_use]
 extern crate criterion;
+use std::time::Duration;
+
 use criterion::Criterion;
 
 use dlx_rs::solver::Solver;
 use dlx_rs::sudoku::Sudoku;
 
 fn sudoku(c: &mut Criterion) {
-    c.bench_function("sudoku", |b| {
+    let mut group = c.benchmark_group("sample-size");
+    group
+        .sample_size(2000)
+        .measurement_time(Duration::from_secs(30));
+
+    group.bench_function("sudoku", |b| {
         b.iter(|| {
             let sudoku = vec![
                 5, 3, 0, 0, 7, 0, 0, 0, 0, 6, 0, 0, 1, 9, 5, 0, 0, 0, 0, 9, 8, 0, 0, 0, 0, 6, 0, 8,
@@ -23,10 +30,16 @@ fn sudoku(c: &mut Criterion) {
             }
         })
     });
+    group.finish()
 }
 
 fn simple(c: &mut Criterion) {
-    c.bench_function("simple", |b| {
+    let mut group = c.benchmark_group("sample-size");
+    group
+        .sample_size(2000)
+        .measurement_time(Duration::from_secs(30));
+
+    group.bench_function("simple", |b| {
         b.iter(|| {
             let mut s = Solver::new(7);
 
@@ -40,6 +53,7 @@ fn simple(c: &mut Criterion) {
             for _solution in s {}
         })
     });
+    group.finish()
 }
 
 criterion_group!(benches, sudoku, simple);
