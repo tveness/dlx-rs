@@ -149,14 +149,12 @@ impl Aztec {
                     solc[min - 1] = Color::Yellow;
                     solc[max - 1] = Color::Yellow;
                 }
+            } else if min % 2 == par {
+                solc[min - 1] = Color::Green;
+                solc[max - 1] = Color::Green;
             } else {
-                if min % 2 == par {
-                    solc[min - 1] = Color::Green;
-                    solc[max - 1] = Color::Green;
-                } else {
-                    solc[min - 1] = Color::Red;
-                    solc[max - 1] = Color::Red;
-                }
+                solc[min - 1] = Color::Red;
+                solc[max - 1] = Color::Red;
             }
         }
 
@@ -166,7 +164,7 @@ impl Aztec {
         let mut rr = " ".repeat(row_pad);
 
         print!("{}", rr);
-        for i in 0..solc.len() {
+        for (i, _) in solc.iter().enumerate() {
             // Print appropriate colour
             match solc[i] {
                 Color::Red => print!("\x1b[31;41mX\x1b[0m"),
