@@ -1,7 +1,7 @@
 # dlx_rs
 
 [![Documentation](https://img.shields.io/docsrs/dlx-rs?style=for-the-badge)](https://docs.rs/dlx-rs/)
-[![Crates.io](https://img.shields.io/crates/v/dlx-rs.svg?label=Tests&style=for-the-badge)](https://crates.io/crates/dlx-rs)
+[![Crates.io](https://img.shields.io/crates/v/dlx-rs.svg?style=for-the-badge)](https://crates.io/crates/dlx-rs)
 [![Build status](https://img.shields.io/github/actions/workflow/status/tveness/dlx-rs/rust.yml?label=Tests&style=for-the-badge
 )](https://github.com/tveness/dlx-rs/actions/workflows/rust.yml)
 
