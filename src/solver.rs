@@ -53,7 +53,9 @@ struct Item {
 ///
 /// We may set up and solve this problem with the following code
 /// ```
+///# use std::error::Error;
 ///# use dlx_rs::solver::Solver;
+///# fn main() -> Result<(), Box<dyn Error>> {
 /// // Create Solver with 4 items
 /// let mut s = Solver::new(4);
 /// // Add options
@@ -63,8 +65,14 @@ struct Item {
 /// s.add_option("o4", &[1]);
 ///
 /// // Iterate through all solutions
-/// assert_eq!(s.next().unwrap(), ["o2","o3","o4"]);
-///
+/// if let Some(solution) = s.next() {
+///     assert_eq!(solution, ["o2","o3","o4"]);
+///     Ok(())
+/// }
+/// else {
+///     Err("No solution found".into())
+///     }
+///# }
 /// ```
 #[derive(Clone)]
 pub struct Solver {
