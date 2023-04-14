@@ -272,8 +272,8 @@ impl Solver {
     /// s.add_option("o4", &[3]);
     /// s.add_option("o5", &[3,5]);
     ///
-    /// let s1 = s.next().unwrap();
-    /// let s2 = s.next().unwrap();
+    /// let s1 = s.next().unwrap_or_default();
+    /// let s2 = s.next().unwrap_or_default();
     /// let s3 = s.next();
     /// assert_eq!(s1,["o2","o1"]);
     /// assert_eq!(s2,["o2","o3","o4"]);
