@@ -15,12 +15,12 @@ use dlx_rs::solver::Solver;
 fn main() {
     let mut s = Solver::new(7);
 
-    s.add_option("A", &[1, 4, 7]);
-    s.add_option("B", &[1, 4]);
-    s.add_option("C", &[4, 5, 7]);
-    s.add_option("D", &[3, 5, 6]);
-    s.add_option("E", &[2, 3, 6, 7]);
-    s.add_option("F", &[2, 7]);
+    s.add_option("A", &[1, 4, 7])
+        .add_option("B", &[1, 4])
+        .add_option("C", &[4, 5, 7])
+        .add_option("D", &[3, 5, 6])
+        .add_option("E", &[2, 3, 6, 7])
+        .add_option("F", &[2, 7]);
 
     println!("Set up problem which looks like:");
     println!("{}", s);

@@ -59,10 +59,10 @@ struct Item {
 /// // Create Solver with 4 items
 /// let mut s = Solver::new(4);
 /// // Add options
-/// s.add_option("o1", &[1,2]);
-/// s.add_option("o2", &[3]);
-/// s.add_option("o3", &[2,4]);
-/// s.add_option("o4", &[1]);
+/// s.add_option("o1", &[1, 2])
+///     .add_option("o2", &[3])
+///     .add_option("o3", &[2, 4])
+///     .add_option("o4", &[1]);
 ///
 /// // Iterate through all solutions
 /// if let Some(solution) = s.next() {
@@ -266,11 +266,11 @@ impl Solver {
     ///
     /// let mut s = Solver::new_optional(4,1);
     ///
-    /// s.add_option("o1", &[1,3]);
-    /// s.add_option("o2", &[2,4]);
-    /// s.add_option("o3", &[1,5]);
-    /// s.add_option("o4", &[3]);
-    /// s.add_option("o5", &[3,5]);
+    /// s.add_option("o1", &[1, 3])
+    ///     .add_option("o2", &[2, 4])
+    ///     .add_option("o3", &[1, 5])
+    ///     .add_option("o4", &[3])
+    ///     .add_option("o5", &[3, 5]);
     ///
     /// let s1 = s.next().unwrap_or_default();
     /// let s2 = s.next().unwrap_or_default();
@@ -357,7 +357,7 @@ impl Solver {
     /// o5     ⦿      ⦿     ⥯     ⥯   s5
     ///        ⥯      ⥯     ⥯     ⥯
     /// ```
-    pub fn add_option(&mut self, name: &str, option: &[Index]) {
+    pub fn add_option(&mut self, name: &str, option: &[Index]) -> &mut Self {
         // Increase max depth, come back to this later
         self.sol_vec.push(0);
         //        self.sol_vec.push(0);
@@ -399,6 +399,8 @@ impl Solver {
         self.options.insert(spacer_index, option.to_vec());
         self.names.push(String::from(name));
         self.spacer_ids.insert(spacer_index, self.names.len() - 1);
+
+        self
     }
 
     /// Covers item in column `i`
@@ -790,9 +792,9 @@ impl Solver {
     ///
     /// let mut s = Solver::new(3);
     ///
-    /// s.add_option("o1",&[1]);
-    /// s.add_option("o2",&[1]);
-    /// s.add_option("o3",&[2,3]);
+    /// s.add_option("o1", &[1])
+    ///     .add_option("o2", &[1])
+    ///     .add_option("o3", &[2, 3]);
     ///
     /// // First get all solutions
     /// let sols: Vec<Vec<String>> = s.clone().collect();
@@ -874,10 +876,10 @@ mod tests {
     #[test]
     fn spacer_for() {
         let mut s = Solver::new(4);
-        s.add_option("o1", &[1, 2]);
-        s.add_option("o2", &[2, 3]);
-        s.add_option("o3", &[3, 4]);
-        s.add_option("o4", &[1, 4]);
+        s.add_option("o1", &[1, 2])
+            .add_option("o2", &[2, 3])
+            .add_option("o3", &[3, 4])
+            .add_option("o4", &[1, 4]);
 
         // This creates a vec which looks like
         // [i0, i1, i2, i3, i4, s0
