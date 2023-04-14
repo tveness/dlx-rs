@@ -45,7 +45,7 @@
 //!     .add_option("o5", &[2, 7])
 //!     .add_option("o6", &[4, 5, 7]);
 //!
-//! let sol = s.next().unwrap();
+//! let sol = s.next().unwrap_or_default();
 //! assert_eq!(sol,["o4","o5","o1"]);
 //!
 //! ```
@@ -83,7 +83,7 @@
 //!     3, 4, 5, 2, 8, 6, 1, 7, 9,
 //! ];
 //! // Checks only solution is true solution
-//! let solution = s.next().unwrap();
+//! let solution = s.next().unwrap_or_default();
 //! assert_eq!(solution, true_solution);
 //! assert_eq!(s.next(), None);
 //! ```

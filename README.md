@@ -90,7 +90,7 @@
      3, 4, 5, 2, 8, 6, 1, 7, 9,
  ];
  // Checks only solution is true solution
- let solution = s.next().unwrap();
+ let solution = s.next().unwrap_or_default();
  assert_eq!(solution, true_solution);
  assert_eq!(s.next(), None);
  ```
