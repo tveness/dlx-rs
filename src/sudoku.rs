@@ -37,7 +37,7 @@ use crate::solver::Solver;
 /// assert_eq!(s.next(), None);
 /// ```
 pub struct Sudoku {
-    pub solver: Solver,
+    pub solver: Solver<String>,
     input: Vec<usize>,
     n: usize,
 }
@@ -90,7 +90,7 @@ impl Sudoku {
                     // Runs 3*N*N+1 -> 3*N*N + N*(N-1) + N = 4*N*N
                     let sub_con = 3 * N * N + N * (sub) + val;
                     //println!("Adding constraint: {}",constraint_name);
-                    solver.add_option(&constraint_name, &[cell_con, row_con, col_con, sub_con]);
+                    solver.add_option(constraint_name, &[cell_con, row_con, col_con, sub_con]);
 
                     /*
                     if !(0 < cell_con && cell_con <= N*N) {

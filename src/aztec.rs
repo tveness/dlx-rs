@@ -20,7 +20,7 @@ enum Color {
 /// ```
 pub struct Aztec {
     n: usize,
-    solver: Solver,
+    solver: Solver<String>,
 }
 
 impl Aztec {
@@ -69,7 +69,7 @@ impl Aztec {
                 let pos1 = x;
                 let pos2 = pos1 + 1;
                 let con_name = format!("H{}#{}", pos1, pos2);
-                solver.add_option(&con_name, &[pos1, pos2]);
+                solver.add_option(con_name, &[pos1, pos2]);
             }
         }
 
@@ -81,14 +81,14 @@ impl Aztec {
                 let pos2 = pos1 + 2 * j + 1;
 
                 let con_name = format!("V{}#{}", pos1, pos2);
-                solver.add_option(&con_name, &[pos1, pos2]);
+                solver.add_option(con_name, &[pos1, pos2]);
 
                 // Now add mirror image of this
                 let mpos1 = max - pos1 + 1;
                 let mpos2 = max - pos2 + 1;
 
                 let mcon_name = format!("V{}#{}", mpos2, mpos1);
-                solver.add_option(&mcon_name, &[mpos2, mpos1]);
+                solver.add_option(mcon_name, &[mpos2, mpos1]);
             }
         }
         // Final (biggest row), runs from n(n-1) + 1 -> n(n-1) + 1 + 2n -1, and pairs with
@@ -99,7 +99,7 @@ impl Aztec {
             let pos2 = x + 2 * n;
 
             let con_name = format!("V{}#{}", pos1, pos2);
-            solver.add_option(&con_name, &[pos1, pos2]);
+            solver.add_option(con_name, &[pos1, pos2]);
         }
 
         Aztec { solver, n }
