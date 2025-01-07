@@ -44,16 +44,28 @@
  The code to solve this is
  ```rust
  use dlx_rs::Solver;
+
+ // Define options, must have these three traits (can also use a String)
+ #[derive(Clone, PartialEq, Debug)]
+ enum Opts {
+     O1,
+     O2,
+     O3,
+     O4,
+     O5,
+     O6
+ }
+
  let mut s = Solver::new(7);
- s.add_option("o1",&[3,5])
-     .add_option("o2",&[1,5,7])
-     .add_option("o3",&[2,3,6])
-     .add_option("o4",&[1,4,6])
-     .add_option("o5",&[2,7])
-     .add_option("o6",&[4,5,7]);
+ s.add_option(Opts::O1, &[3, 5])
+     .add_option(Opts::O2, &[1, 5, 7])
+     .add_option(Opts::O3, &[2, 3, 6])
+     .add_option(Opts::O4, &[1, 4, 6])
+     .add_option(Opts::O5, &[2, 7])
+     .add_option(Opts::O6, &[4, 5, 7]);
 
  let sol = s.next().unwrap_or_default();
- assert_eq!(sol,["o4","o5","o1"]);
+ assert_eq!(sol,[Opts::O4,Opts::O5,Opts::O1]);
 
  ```
 
