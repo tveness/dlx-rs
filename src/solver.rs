@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::fmt::{self, Display};
+use std::fmt::{self, Debug};
 type Index = usize;
 
 #[derive(Clone, Debug)]
@@ -77,7 +77,7 @@ struct Item {
 #[derive(Clone)]
 pub struct Solver<T>
 where
-    T: std::fmt::Display + PartialEq + Clone,
+    T: std::fmt::Debug + PartialEq + Clone,
 {
     elements: Vec<Link>,
     items: Index,
@@ -104,7 +104,7 @@ enum Stage {
     X8,
 }
 
-impl<T: std::fmt::Display + PartialEq + Clone> fmt::Display for Solver<T> {
+impl<T: std::fmt::Debug + PartialEq + Clone> fmt::Display for Solver<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // First write columns
         let mut last_col = 1;
@@ -240,7 +240,7 @@ impl Link for Spacer {
 }
 */
 
-impl<T: PartialEq + Display + Clone> Solver<T> {
+impl<T: PartialEq + Debug + Clone> Solver<T> {
     /// Returns a solver with `n` items, all of which must be covered exactly
     /// once
     pub fn new(n: Index) -> Self {
@@ -854,7 +854,7 @@ impl<T: PartialEq + Display + Clone> Solver<T> {
     }
 }
 
-impl<T: Display + PartialEq + Clone> Iterator for Solver<T> {
+impl<T: Debug + PartialEq + Clone> Iterator for Solver<T> {
     type Item = Vec<T>;
     /// Produces next solution by following algorithm X
     /// as described in tAoCP in Fasc 5c, Dancing Links, Knuth
