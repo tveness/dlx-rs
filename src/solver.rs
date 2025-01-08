@@ -808,7 +808,7 @@ impl<T: PartialEq + Debug + Clone> Solver<T> {
     ///
     /// // Now select o1 and get all solutions
     /// s.select("o1");
-    /// assert_eq!( vec!["o3".to_string()], s.next().unwrap());
+    /// assert_eq!( vec!["o3"], s.next().unwrap());
     /// ```
     pub fn select(&mut self, name: T) -> Result<(), &'static str> {
         // This selects an option by doing the followings
