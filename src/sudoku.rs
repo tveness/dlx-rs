@@ -137,7 +137,7 @@ impl Sudoku {
                 let col = i - n * n * row;
                 let opt_string = format!("R{}C{}#{}", row + 1, col + 1, *item);
                 //            println!("{}",opt_string);
-                s.solver.select(&opt_string).unwrap();
+                s.solver.select(opt_string).unwrap();
             }
         }
 

@@ -795,27 +795,27 @@ impl<T: PartialEq + Debug + Clone> Solver<T> {
     ///
     /// let mut s = Solver::new(3);
     ///
-    /// s.add_option("o1".to_string(), &[1])
-    ///     .add_option("o2".to_string(), &[1])
-    ///     .add_option("o3".to_string(), &[2, 3]);
+    /// s.add_option("o1", &[1])
+    ///     .add_option("o2", &[1])
+    ///     .add_option("o3", &[2, 3]);
     ///
     /// // First get all solutions
-    /// let sols: Vec<Vec<String>> = s.clone().collect();
-    /// assert_eq!( sols.len(), 2);
-    /// assert_eq!( vec!["o3".to_string(), "o1".to_string()], sols[0]);
-    /// assert_eq!( vec!["o3".to_string(), "o2".to_string()], sols[1]);
+    /// let sols: Vec<Vec<&str>> = s.clone().collect();
+    /// assert_eq!(sols.len(), 2);
+    /// assert_eq!( vec!["o3", "o1"], sols[0]);
+    /// assert_eq!( vec!["o3", "o2"], sols[1]);
     ///
     ///
     /// // Now select o1 and get all solutions
-    /// s.select(&"o1".to_string());
+    /// s.select("o1");
     /// assert_eq!( vec!["o3".to_string()], s.next().unwrap());
     /// ```
-    pub fn select(&mut self, name: &T) -> Result<(), &'static str> {
+    pub fn select(&mut self, name: T) -> Result<(), &'static str> {
         // This selects an option by doing the followings
 
         // First get the spacer position of the option by firstly finding which
         // option it was
-        let id = match self.names.iter().position(|x| x == name) {
+        let id = match self.names.iter().position(|x| x == &name) {
             Some(z) => z,
             None => return Err("Invalid option specified"),
         };
