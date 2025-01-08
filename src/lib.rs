@@ -38,7 +38,6 @@
 //! ```
 //! use dlx_rs::Solver;
 //!
-//! // Define options, must have these three traits (can also use a String)
 //! #[derive(Clone, PartialEq, Debug)]
 //! enum Opts {
 //!     O1,
@@ -46,7 +45,7 @@
 //!     O3,
 //!     O4,
 //!     O5,
-//!     O6
+//!     O6,
 //! }
 //!
 //! let mut s = Solver::new(7);
@@ -58,12 +57,27 @@
 //!     .add_option(Opts::O6, &[4, 5, 7]);
 //!
 //! let sol = s.next().unwrap_or_default();
-//! assert_eq!(sol,[Opts::O4,Opts::O5,Opts::O1]);
+//! assert_eq!(sol, [Opts::O4, Opts::O5, Opts::O1]);
+//! ```
 //!
+//! Or, we can use strings in a case where we might want to generate the options at runtime
+//!
+//! ```
+//! use dlx_rs::Solver;
+//!
+//! let mut s = Solver::new(7);
+//! s.add_option("o1", &[3, 5])
+//!     .add_option("o2", &[1, 5, 7])
+//!     .add_option("o3", &[2, 3, 6])
+//!     .add_option("o4", &[1, 4, 6])
+//!     .add_option("o5", &[2, 7])
+//!     .add_option("o6", &[4, 5, 7]);
+//!
+//! let sol = s.next().unwrap_or_default();
+//! assert_eq!(sol, ["o4", "o5", "o1"]);
 //! ```
 //!
 //! ## Solving a Sudoku
-//!
 //!
 //! ```
 //! use dlx_rs::Sudoku;
@@ -99,7 +113,6 @@
 //! assert_eq!(solution, true_solution);
 //! assert_eq!(s.next(), None);
 //! ```
-//!
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 pub mod aztec;
