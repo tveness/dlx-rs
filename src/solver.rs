@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::fmt;
+use std::fmt::{self, Debug};
 type Index = usize;
 
 #[derive(Clone, Debug)]
@@ -75,7 +75,10 @@ struct Item {
 ///# }
 /// ```
 #[derive(Clone)]
-pub struct Solver {
+pub struct Solver<T>
+where
+    T: std::fmt::Debug + PartialEq + Clone,
+{
     elements: Vec<Link>,
     items: Index,
     options: HashMap<Index, Vec<Index>>,
@@ -83,7 +86,7 @@ pub struct Solver {
     sol_vec: Vec<Index>,
     yielding: bool,
     idx: Index,
-    names: Vec<String>,
+    names: Vec<T>,
     spacer_ids: HashMap<Index, usize>,
     stage: Stage,
     optional: Index,
@@ -101,7 +104,7 @@ enum Stage {
     X8,
 }
 
-impl fmt::Display for Solver {
+impl<T: std::fmt::Debug + PartialEq + Clone> fmt::Display for Solver<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // First write columns
         let mut last_col = 1;
@@ -237,7 +240,7 @@ impl Link for Spacer {
 }
 */
 
-impl Solver {
+impl<T: PartialEq + Debug + Clone> Solver<T> {
     /// Returns a solver with `n` items, all of which must be covered exactly
     /// once
     pub fn new(n: Index) -> Self {
@@ -357,7 +360,7 @@ impl Solver {
     /// o5     ⦿      ⦿     ⥯     ⥯   s5
     ///        ⥯      ⥯     ⥯     ⥯
     /// ```
-    pub fn add_option(&mut self, name: &str, option: &[Index]) -> &mut Self {
+    pub fn add_option(&mut self, name: T, option: &[Index]) -> &mut Self {
         // Increase max depth, come back to this later
         self.sol_vec.push(0);
         //        self.sol_vec.push(0);
@@ -397,7 +400,7 @@ impl Solver {
 
         // Add the entry to the hash table
         self.options.insert(spacer_index, option.to_vec());
-        self.names.push(String::from(name));
+        self.names.push(name.clone());
         self.spacer_ids.insert(spacer_index, self.names.len() - 1);
 
         self
@@ -542,7 +545,7 @@ impl Solver {
 
     /// Implements algorithm X as a finite state machine
     #[allow(dead_code)]
-    pub fn solve(&mut self) -> Option<Vec<String>> {
+    pub fn solve(&mut self) -> Option<Vec<T>> {
         // Follows stages of algorithm description in Fasc 5c, Knuth
 
         // The only ways to break this loop are to yield a solution via X2 or to
@@ -582,7 +585,7 @@ impl Solver {
     ///
     // TODO: Is it useful to have the double map? We don't used spacer_ids for
     //       anything else, so could condense it into a single HashMap
-    pub fn output(&self) -> Vec<String> {
+    pub fn output(&self) -> Vec<T> {
         let to_return = self
             .sol_vec
             .iter()
@@ -597,7 +600,7 @@ impl Solver {
     /// Stage X2 of Algorithm X
     /// If rlink(0) = 0, then all items are covered, so return current solution
     /// and also go to X8
-    fn x2(&mut self) -> Option<Vec<String>> {
+    fn x2(&mut self) -> Option<Vec<T>> {
         //println!("State:");
         //println!("{}",self);
         //println!("RLINK: {}",self.elements[0].r());
@@ -797,8 +800,8 @@ impl Solver {
     ///     .add_option("o3", &[2, 3]);
     ///
     /// // First get all solutions
-    /// let sols: Vec<Vec<String>> = s.clone().collect();
-    /// assert_eq!( sols.len(), 2);
+    /// let sols: Vec<Vec<&str>> = s.clone().collect();
+    /// assert_eq!(sols.len(), 2);
     /// assert_eq!( vec!["o3", "o1"], sols[0]);
     /// assert_eq!( vec!["o3", "o2"], sols[1]);
     ///
@@ -807,29 +810,16 @@ impl Solver {
     /// s.select("o1");
     /// assert_eq!( vec!["o3"], s.next().unwrap());
     /// ```
-    pub fn select(&mut self, name: &str) -> Result<(), &'static str> {
+    pub fn select(&mut self, name: T) -> Result<(), &'static str> {
         // This selects an option by doing the followings
 
         // First get the spacer position of the option by firstly finding which
         // option it was
-        let id = match self
-            .names
-            .clone()
-            .iter()
-            .position(|x| x == &name.to_string())
-        {
+        let id = match self.names.iter().position(|x| x == &name) {
             Some(z) => z,
             None => return Err("Invalid option specified"),
         };
-        /*
-        let mut id =0;
-        for (i,item) in self.names.iter().enumerate() {
-            if *item == name.to_string() {
-                id = i;
-                break;
-            }
-        }
-        */
+
         // Now find the spacer id by going this many links down the chain
         // Start at root spacer node
         let mut spacer_id = self.items + 1;
@@ -856,8 +846,8 @@ impl Solver {
     }
 }
 
-impl Iterator for Solver {
-    type Item = Vec<String>;
+impl<T: Debug + PartialEq + Clone> Iterator for Solver<T> {
+    type Item = Vec<T>;
     /// Produces next solution by following algorithm X
     /// as described in tAoCP in Fasc 5c, Dancing Links, Knuth
     ///

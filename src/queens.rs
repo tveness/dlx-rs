@@ -12,7 +12,7 @@ use crate::Solver;
 /// ```
 pub struct Queens {
     n: usize,
-    solver: Solver,
+    solver: Solver<String>,
 }
 
 impl Queens {
@@ -51,7 +51,7 @@ impl Queens {
                 // 6*N-1 -> N**2 + 6*N - 2
                 let is_queen = 6 * n - 2 + r + n * (c - 1);
 
-                solver.add_option(&con_name, &[col_con, row_con, rd_con, ld_con, is_queen]);
+                solver.add_option(con_name, &[col_con, row_con, rd_con, ld_con, is_queen]);
             }
         }
 
