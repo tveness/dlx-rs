@@ -819,15 +819,7 @@ impl<T: PartialEq + Debug + Clone> Solver<T> {
             Some(z) => z,
             None => return Err("Invalid option specified"),
         };
-        /*
-        let mut id =0;
-        for (i,item) in self.names.iter().enumerate() {
-            if *item == name.to_string() {
-                id = i;
-                break;
-            }
-        }
-        */
+
         // Now find the spacer id by going this many links down the chain
         // Start at root spacer node
         let mut spacer_id = self.items + 1;
