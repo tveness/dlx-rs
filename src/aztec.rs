@@ -1,3 +1,4 @@
+//! An interface to a [`Solver`]  in order to solve an Aztec diamond problem
 use crate::Solver;
 use std::collections::HashSet;
 

@@ -1,3 +1,5 @@
+//! Sudoku solver
+
 use crate::solver::Solver;
 
 /// Implements sudoku solver
@@ -37,14 +39,15 @@ use crate::solver::Solver;
 /// assert_eq!(s.next(), None);
 /// ```
 pub struct Sudoku {
+    /// Internal solver
     pub solver: Solver<String>,
     input: Vec<usize>,
     n: usize,
 }
 
 impl Sudoku {
-    // Initialises the constraints for an n*n sudoku-grid (regular is n=3, as the grid is 9x9)
-    // This corresponds to a matrix with dimension (n**6)x(4*n**4)
+    /// Initialises the constraints for an n*n sudoku-grid (regular is n=3, as the grid is 9x9)
+    /// This corresponds to a matrix with dimension (n**6)x(4*n**4)
     pub fn new(n: usize) -> Sudoku {
         // What are the constraints we need to meet?
         // 1. Each cell must contain a number i.e. R1C1 must have precisely one number in it
