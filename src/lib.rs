@@ -3,18 +3,23 @@
 #![deny(missing_docs)]
 
 /// Aztec diamond solver
+#[cfg(feature = "aztec")]
 pub mod aztec;
+#[cfg(feature = "aztec")]
+pub use crate::aztec::Aztec;
 
 /// N queens problem solver
+#[cfg(feature = "queens")]
 pub mod queens;
+#[cfg(feature = "queens")]
+pub use crate::queens::Queens;
 
 /// General dancing links solver
 pub mod solver;
+pub use crate::solver::Solver;
 
+#[cfg(feature = "sudoku")]
 /// Sudoku solver
 pub mod sudoku;
-
-pub use crate::aztec::Aztec;
-pub use crate::queens::Queens;
-pub use crate::solver::Solver;
+#[cfg(feature = "sudoku")]
 pub use crate::sudoku::Sudoku;
