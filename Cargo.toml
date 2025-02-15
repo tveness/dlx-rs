@@ -2,12 +2,10 @@
 name = "dlx-rs"
 version = "1.2.0"
 edition = "2021"
-license = "CC0-1.0"
+license = "MIT"
 description = "Implementation of dancing links in Rust"
 repository = "https://github.com/tveness/dlx-rs"
 readme = "README.md"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
 name = "dlx_rs"
