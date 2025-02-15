@@ -22,7 +22,6 @@ harness = false
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]
 
-
 [features]
 default = [ "aztec", "queens", "sudoku" ]
 aztec = []
