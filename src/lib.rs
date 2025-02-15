@@ -113,7 +113,7 @@
 //! assert_eq!(solution, true_solution);
 //! assert_eq!(s.next(), None);
 //! ```
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 pub mod aztec;
 pub mod queens;
